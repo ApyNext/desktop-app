@@ -29,12 +29,10 @@ fn main() {
 
 fn App(cx: Scope) -> Element {
     cx.render(rsx! {
-            div {
-                link {
-                    rel: "stylesheet",
-                    href: "./public/tailwind.css"
-                },
-                Router::<Route> {}
-            }
+            link {
+                rel: "stylesheet",
+                href: "./public/tailwind.css"
+            },
+            Router::<Route> {}
     })
 }
