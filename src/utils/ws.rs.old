@@ -1,0 +1,24 @@
+use fastwebsockets::{WebSocket, WebSocketError, handshake};
+use hyper::{Request, header::{UPGRADE, CONNECTION}, Body};
+use reqwest::Upgraded;
+use tokio::net::TcpStream;
+
+pub async fn connect() -> Result<WebSocket<Upgraded>, WebSocketError> {
+    let stream = TcpStream::connect("localhost:8000/ws").await?;
+
+    let req = Request::builder()
+        .method("GET")
+        .uri("http://localhost:8000/ws")
+        .header("Host", "localhost:8000")
+        .header(UPGRADE, "websocket")
+        .header(CONNECTION, "upgrade")
+        .header("Sec-WebSocket-Key", handshake::generate_key())
+        .header("Sec-WebSocket-Version", "13")
+        .body(Body::empty())?;
+
+    let (ws, _) = handshake::client(&Spawn)
+}
+
+struct SpawnExecutor;
+
+impl<Fut>
