@@ -1,5 +1,6 @@
 use chrono::NaiveDate;
 use dioxus::prelude::*;
+use dioxus_router::prelude::use_navigator;
 use email_address::EmailAddress;
 use hyper::{header::CONTENT_TYPE, HeaderMap};
 use log::error;
@@ -11,7 +12,8 @@ use crate::{
         custom_request::custom_post_request,
         register::{check_username, RegisterUser},
     },
-    API_URL,
+    screens::email_verification::EmailVerification,
+    API_URL, Route,
 };
 
 pub fn Register(cx: Scope) -> Element {
@@ -23,22 +25,24 @@ pub fn Register(cx: Scope) -> Element {
     let password_error = use_state(cx, || String::new());
     let confirm_password = use_state(cx, || String::new());
     let confirm_password_error = use_state(cx, || String::new());
-    let date = use_state(cx, || "2023-10-29".to_string());
-    let date_error = None::<String>;
     let is_male = use_state(cx, || None::<bool>);
-    let is_male_error = None::<String>;
+    let is_male_error = use_state(cx, || String::new());
+    let birthdate = use_state(cx, || String::from("2023-10-29"));
+    let birthdate_error = use_state(cx, || String::new());
     let client_state =
         use_shared_state::<Client>(cx).expect("Erreur lors de la récupération du state Client");
+
+    let nav = use_navigator(cx);
 
     cx.render(rsx! {
         div {
             class: "w-screen min-h-screen bg-black relative",
             form {
-                class: "bg-gray-900 text-white rounded-xl md:p-8 lg:p-16 p-4 text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+                class: "bg-gray-900 text-white rounded-xl md:p-8 lg:p-12 p-4 text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
                 onsubmit: move |_| {
-                    to_owned![date, username, email, password, is_male, client_state];
+                    to_owned![username, email, password, is_male, birthdate, client_state, nav];
                     async move {
-                        let date = match NaiveDate::parse_from_str(date.get(), "%Y-%m-%d") {
+                        let date = match NaiveDate::parse_from_str(birthdate.get(), "%Y-%m-%d") {
                             Ok(date) => date,
                             Err(e) => {
                                 log::warn!("Erreur lors de la convertion de la date en secondes depuis l'Epoch : {}", e);
@@ -64,7 +68,9 @@ pub fn Register(cx: Scope) -> Element {
                                     AppError::Forbidden(e) => error!("Forbidden : {e}"),
                                     AppError::UnknownError(e) => error!("Unknown error, status code {e}")
                                 }
+                            return;
                             };
+                        nav.replace(Route::EmailVerification {  });
                         }
                     },
                     h1 {
@@ -142,7 +148,7 @@ pub fn Register(cx: Scope) -> Element {
                     "{confirm_password_error}"
                 }
                 label {
-                    class: "block",
+                    display: "block",
                     r#for: "gender",
                     "Genre"
                 },
@@ -152,11 +158,18 @@ pub fn Register(cx: Scope) -> Element {
                     class: "mt-1 mb-2 text-black",
                     oninput: move |e| {
                         let gender = e.data.value.clone();
+                        let mut is_error = false;
                         is_male.set(match gender.as_str() {
                             "male" => Some(true),
                             "female" => Some(false),
-                            _ => None
+                            "null" => None,
+                            _ => {
+                                is_error = true;
+                                None
+                            }
                         });
+                        
+                        is_male_error.set(if is_error {String::from("Veuillez renseigner ce champ.")} else {String::new()});
                     },
                     option {
                         class: "appearance-none bg-black",
@@ -176,11 +189,22 @@ pub fn Register(cx: Scope) -> Element {
                         "Je ne souhaite pas répondre"
                     }
                 },
+                p {
+                    class: "text-red-700 text-center font-bold mb-2",
+                    display: if is_male_error.get().is_empty() {"none"} else {"block"},
+                    "{is_male_error}"
+                },
+                label {
+                    display: "block",
+                    r#for: "birthdate",
+                    "Date de naissance"
+                }
                 input {
-                    class: "bg-black block mb-4 mx-auto p-2",
+                    class: "bg-black block mb-4 mx-auto",
                     r#type: "date",
-                    value: "{date}",
-                    oninput: move |e| date.set(e.value.clone()),
+                    id: "birthdate",
+                    value: "{birthdate}",
+                    oninput: move |e| birthdate.set(e.value.clone()),
                 },
                 input {
                     class: "bg-black w-full text-lg font-bold text-white border-solid border-2 border-white hover:bg-white hover:text-black p-3 block mx-auto cursor-pointer duration-500",

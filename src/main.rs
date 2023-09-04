@@ -8,6 +8,7 @@ use components::navbar::NavBar;
 use dioxus::prelude::*;
 use dioxus_router::prelude::*;
 use reqwest::Client;
+use screens::email_verification::EmailVerification;
 use screens::home::Home;
 use screens::loading::Loading;
 use screens::register::Register;
@@ -16,7 +17,7 @@ pub const API_URL: &str = "http://localhost:8000";
 
 #[derive(Routable, Clone)]
 #[rustfmt::skip]
-enum Route {
+pub enum Route {
     #[layout(NavBar)]
         #[route("/home")]
         Home {},
@@ -24,7 +25,9 @@ enum Route {
     #[route("/")]
     Loading {},
     #[route("/register")]
-    Register {}
+    Register {},
+    #[route("/register/email_confirmation")]
+    EmailVerification {}
 }
 
 fn main() {
