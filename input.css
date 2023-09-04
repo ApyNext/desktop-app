@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input[type="text"], input[type="email"], input[type="password"] {
+  outline: none;
+  border-radius: 0.5rem;
+  background-color: black;
+  padding: 0.75rem;
+  border: 2px solid;
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  transition: 0.5s;
+}
+
+input[type=submit] {
+  border-width: 2px;
+  border-radius: 9999px;
+}

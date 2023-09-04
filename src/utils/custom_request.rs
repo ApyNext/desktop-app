@@ -1,19 +1,20 @@
 use hyper::{http::HeaderValue, HeaderMap, StatusCode};
 use reqwest::Client;
+use serde::Serialize;
 
 use super::app_error::AppError;
 
 pub async fn custom_post_request(
     client: &Client,
     url: String,
-    body: String,
+    body: &impl Serialize,
     headers: HeaderMap<HeaderValue>,
 ) -> Result<(), AppError> {
     log::info!("Sending...");
     let res = client
         .post(url)
         .headers(headers)
-        .body(body)
+        .json(body)
         .send()
         .await
         .unwrap();
