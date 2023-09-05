@@ -554,10 +554,6 @@ video {
   margin: 1rem;
 }
 
-.m-auto {
-  margin: auto;
-}
-
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -587,16 +583,12 @@ video {
   display: grid;
 }
 
-.h-3\/4 {
-  height: 75%;
-}
-
 .min-h-screen {
   min-height: 100vh;
 }
 
-.w-3\/4 {
-  width: 75%;
+.w-1\/2 {
+  width: 50%;
 }
 
 .w-full {
@@ -605,14 +597,6 @@ video {
 
 .w-screen {
   width: 100vw;
-}
-
-.w-2\/4 {
-  width: 50%;
-}
-
-.w-1\/2 {
-  width: 50%;
 }
 
 .min-w-\[228px\] {
@@ -631,12 +615,6 @@ video {
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.appearance-none {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
 }
 
 .flex-row {

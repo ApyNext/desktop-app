@@ -1,5 +1,6 @@
 use hyper::StatusCode;
 
+#[derive(Debug)]
 pub enum AppError {
     //Request errors
     InternalServerError,
