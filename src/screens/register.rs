@@ -12,7 +12,6 @@ use crate::{
         custom_request::custom_post_request,
         register::{check_username, RegisterUser},
     },
-    screens::email_verification::EmailVerification,
     API_URL, Route,
 };
 
@@ -38,7 +37,7 @@ pub fn Register(cx: Scope) -> Element {
         div {
             class: "w-screen min-h-screen bg-black relative",
             form {
-                class: "bg-gray-900 text-white rounded-xl md:p-8 lg:p-12 p-4 text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+                class: "bg-gray-900 text-white rounded-xl md:p-8 lg:p-12 p-4 text-center absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-[228px] w-1/2",
                 onsubmit: move |_| {
                     to_owned![username, email, password, is_male, birthdate, client_state, nav];
                     async move {
@@ -172,7 +171,6 @@ pub fn Register(cx: Scope) -> Element {
                         is_male_error.set(if is_error {String::from("Veuillez renseigner ce champ.")} else {String::new()});
                     },
                     option {
-                        class: "appearance-none bg-black",
                         value: "",
                         "Sélectionnez votre genre"
                     },
@@ -204,7 +202,29 @@ pub fn Register(cx: Scope) -> Element {
                     r#type: "date",
                     id: "birthdate",
                     value: "{birthdate}",
-                    oninput: move |e| birthdate.set(e.value.clone()),
+                    oninput: move |e| {
+                        birthdate.set(e.value.clone());
+                        let year = &e.value[..4];
+                        let number_year: u32 = match year.parse() {
+                            Ok(year) => year,
+                            Err(e) => {
+                                log::error!("Date invalide : {e}");
+                                birthdate_error.set("Date invalide".to_string());
+                                return;
+                            }
+                        };
+                        if number_year < 1900 {
+                            birthdate_error.set("La date de naissance doit être située après 1900.".to_string());
+                            log::error!("La date de naissance doit être située après 1900.");
+                        } else {
+                            birthdate_error.set(String::new());
+                        }
+                    },
+                },
+                p {
+                    class: "text-red-700 text-center font-bold mb-2",
+                    display: if birthdate_error.get().is_empty() {"none"} else {"block"},
+                    "{birthdate_error}"
                 },
                 input {
                     class: "bg-black w-full text-lg font-bold text-white border-solid border-2 border-white hover:bg-white hover:text-black p-3 block mx-auto cursor-pointer duration-500",

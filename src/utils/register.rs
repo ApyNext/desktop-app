@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-use super::app_error::AppError;
-
 #[derive(Serialize, Deserialize)]
 pub struct RegisterUser<'a> {
     pub username: &'a str,
